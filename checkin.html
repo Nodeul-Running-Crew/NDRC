@@ -220,7 +220,8 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-wNAgk-re1cXUA3bZTQC5hTCT2u9oE7vnLBGjtDMbcD63Z40hndTjUQhHNcznmFwd/exec"
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqlyLbmXHSwa3XJBDA-lPf6RmML3fILSi5p31139YBXiDwDDxGm2adC9j1WvR9Ic5x/exec";
+
   const params = new URLSearchParams(location.search);
   const TOKEN = params.get("token") || "";
   let selectedPace = "";
@@ -230,11 +231,7 @@
       year: "numeric", month: "long", day: "numeric", weekday: "long"
     });
 
-    const paces = [];
-    for (let min = 4; min <= 7; min++) {
-      paces.push(`${min}′00″`);
-      if (min < 7) paces.push(`${min}′30″`);
-    }
+    const paces = ["4′30″","5′00″","5′30″","6′00″","6′30″","7′00″"];
 
     const grid = document.getElementById("pace-grid");
     paces.forEach(pace => {
