@@ -26,8 +26,8 @@
   }
 
   .hero img {
-    width: 500px;
-    max-width: 800px;
+    width: 320px;
+    max-width: 450px;
   }
 
   .card {
@@ -88,6 +88,46 @@
   input[type="text"]:focus { border-color: #c8e435; }
   input[type="text"]::placeholder { color: #d1d5db; }
 
+  .section-gap { margin-top: 24px; }
+
+  .pace-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .pace-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .pace-btn {
+    padding: 10px 6px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .pace-btn:active { transform: scale(0.96); }
+
+  .pace-btn.selected {
+    background: #c8e435;
+    border-color: #c8e435;
+    color: #1a1a2e;
+    font-weight: 700;
+  }
+
   .btn {
     width: 100%;
     padding: 15px;
@@ -98,7 +138,7 @@
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 12px;
+    margin-top: 20px;
     transition: opacity 0.15s, transform 0.1s;
   }
 
@@ -133,6 +173,16 @@
 
   .success-screen h2 { font-size: 22px; color: #111827; margin-bottom: 8px; }
   .success-screen p { font-size: 14px; color: #6b7280; line-height: 1.6; }
+  .success-pace {
+    display: inline-block;
+    margin-top: 12px;
+    background: #c8e435;
+    color: #1a1a2e;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 20px;
+  }
 </style>
 </head>
 <body>
@@ -151,6 +201,11 @@
     <label class="input-label" for="name-input">이름을 입력해주세요</label>
     <input type="text" id="name-input" placeholder="홍길동" autocomplete="off" autocorrect="off">
 
+    <div class="section-gap">
+      <label class="pace-label">원하는 페이스를 선택해주세요</label>
+      <div class="pace-grid" id="pace-grid"></div>
+    </div>
+
     <button class="btn" id="checkin-btn" onclick="doCheckin()">출석 완료</button>
 
     <div class="msg" id="msg-box"></div>
@@ -160,18 +215,38 @@
     <div class="check-circle">✓</div>
     <h2 id="success-name">출석 완료!</h2>
     <p>오늘도 함께 달려요 🏃</p>
+    <div class="success-pace" id="success-pace"></div>
   </div>
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqlyLbmXHSwa3XJBDA-lPf6RmML3fILSi5p31139YBXiDwDDxGm2adC9j1WvR9Ic5x/exec";
-
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-wNAgk-re1cXUA3bZTQC5hTCT2u9oE7vnLBGjtDMbcD63Z40hndTjUQhHNcznmFwd/exec"
   const params = new URLSearchParams(location.search);
   const TOKEN = params.get("token") || "";
+  let selectedPace = "";
 
   function init() {
     document.getElementById("today-date").textContent = new Date().toLocaleDateString("ko-KR", {
       year: "numeric", month: "long", day: "numeric", weekday: "long"
+    });
+
+    const paces = [];
+    for (let min = 4; min <= 7; min++) {
+      paces.push(`${min}′00″`);
+      if (min < 7) paces.push(`${min}′30″`);
+    }
+
+    const grid = document.getElementById("pace-grid");
+    paces.forEach(pace => {
+      const btn = document.createElement("button");
+      btn.className = "pace-btn";
+      btn.textContent = pace;
+      btn.onclick = () => {
+        document.querySelectorAll(".pace-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedPace = pace;
+      };
+      grid.appendChild(btn);
     });
   }
 
@@ -184,17 +259,23 @@
       return;
     }
 
+    if (!selectedPace) {
+      showMsg("페이스를 선택해주세요.", "error");
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = "처리 중...";
 
     try {
-      const url = `${SCRIPT_URL}?action=checkin&token=${TOKEN}&name=${encodeURIComponent(name)}`;
+      const url = `${SCRIPT_URL}?action=checkin&token=${TOKEN}&name=${encodeURIComponent(name)}&pace=${encodeURIComponent(selectedPace)}`;
       await fetch(url, { method: "GET", mode: "no-cors" });
 
       document.getElementById("main-form").style.display = "none";
       const sc = document.getElementById("success-screen");
       sc.style.display = "block";
       document.getElementById("success-name").textContent = `${name}님, 출석 완료!`;
+      document.getElementById("success-pace").textContent = `목표 페이스 ${selectedPace}`;
 
     } catch(e) {
       showMsg("네트워크 오류가 발생했습니다. 다시 시도해주세요.", "error");
