@@ -22,10 +22,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 48px 24px 56px;
+    padding: 48px 24px 40px;
   }
 
-  .hero img { width: 400px; max-width: 90%; }
+  .hero img { width: 320px; max-width: 80%; }
 
   .card {
     background: #fff;
@@ -237,7 +237,7 @@
 
   <div class="success-screen" id="success-screen">
     <div class="check-circle">&#10003;</div>
-    <h2 id="success-name">환영합니다!</h2>
+    <h2 id="success-name">출석 완료!</h2>
     <p>오늘도 함께 달려요!</p>
     <div class="success-pace" id="success-pace"></div>
   </div>
@@ -297,7 +297,7 @@ function doCheckin() {
     .then(function() {
       document.getElementById("main-form").style.display = "none";
       document.getElementById("success-screen").style.display = "block";
-      document.getElementById("success-name").textContent = name + "님, 환영합니다!";
+      document.getElementById("success-name").textContent = name + "님, 출석 완료!";
       document.getElementById("success-pace").textContent = "목표 페이스 " + selectedPace;
       launchConfetti();
     })
@@ -314,7 +314,7 @@ function showMsg(text, type) {
   box.className = "msg " + type;
 }
 
-// ── Confetti 효과 ──
+// ── 불꽃놀이 효과 ──
 function launchConfetti() {
   var canvas = document.getElementById("confetti-canvas");
   var ctx = canvas.getContext("2d");
@@ -322,52 +322,78 @@ function launchConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  var colors = ["#c8e435","#1a1a2e","#22c55e","#3b82f6","#f59e0b","#ef4444","#8b5cf6","#fff"];
-  var particles = [];
+  var colors = ["#c8e435","#22c55e","#3b82f6","#f59e0b","#ef4444","#8b5cf6","#fff","#fb923c"];
+  var bursts = [];
 
-  for (var i = 0; i < 150; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: -10 - Math.random() * 100,
-      w: 8 + Math.random() * 8,
-      h: 4 + Math.random() * 4,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      vx: (Math.random() - 0.5) * 4,
-      vy: 3 + Math.random() * 4,
-      angle: Math.random() * 360,
-      spin: (Math.random() - 0.5) * 8,
-      opacity: 1
-    });
+  function createBurst(cx, cy, count) {
+    var particles = [];
+    for (var i = 0; i < count; i++) {
+      var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
+      var speed = 4 + Math.random() * 8;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 3 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        opacity: 1,
+        tail: []
+      });
+    }
+    return particles;
   }
 
-  var frame = 0;
-  var maxFrames = 120;
+  var cx = canvas.width / 2;
+  var cy = canvas.height / 2;
+
+  setTimeout(function() { bursts.push.apply(bursts, createBurst(cx, cy * 0.5, 40)); }, 0);
+  setTimeout(function() { bursts.push.apply(bursts, createBurst(cx * 0.4, cy * 0.7, 30)); }, 200);
+  setTimeout(function() { bursts.push.apply(bursts, createBurst(cx * 1.6, cy * 0.7, 30)); }, 350);
+  setTimeout(function() { bursts.push.apply(bursts, createBurst(cx, cy * 0.4, 35)); }, 500);
+  setTimeout(function() { bursts.push.apply(bursts, createBurst(cx * 0.6, cy * 0.5, 25)); }, 650);
+  setTimeout(function() { bursts.push.apply(bursts, createBurst(cx * 1.4, cy * 0.5, 25)); }, 800);
+
+  var running = true;
 
   function animate() {
+    if (!running) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    frame++;
 
-    particles.forEach(function(p) {
+    var alive = false;
+    bursts.forEach(function(p) {
+      if (p.opacity <= 0) return;
+      alive = true;
+
+      p.tail.unshift({ x: p.x, y: p.y });
+      if (p.tail.length > 6) p.tail.pop();
+
       p.x += p.vx;
       p.y += p.vy;
-      p.angle += p.spin;
-      p.vy += 0.1;
-      if (frame > maxFrames * 0.6) {
-        p.opacity -= 0.02;
-      }
+      p.vy += 0.15;
+      p.vx *= 0.98;
+      p.opacity -= 0.018;
 
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, p.opacity);
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.angle * Math.PI / 180);
+      p.tail.forEach(function(t, i) {
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, p.size * (1 - i / p.tail.length) * 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.opacity * (1 - i / p.tail.length) * 0.4);
+        ctx.fill();
+      });
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      ctx.restore();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fill();
     });
 
-    if (frame < maxFrames) {
+    ctx.globalAlpha = 1;
+
+    if (alive) {
       requestAnimationFrame(animate);
     } else {
+      running = false;
       canvas.style.display = "none";
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
