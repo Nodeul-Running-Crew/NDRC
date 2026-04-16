@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDRC 오늘 런닝 안내</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif; background: #f5f5f7; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+.wrap { width: 100%; max-width: 500px; }
+
+.slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+}
+.slider::-webkit-scrollbar { display: none; }
+
+.card {
+  flex-shrink: 0;
+  width: 300px;
+  height: 300px;
+  border-radius: 20px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.deco { position: absolute; border-radius: 50%; opacity: 0.1; }
+
+.card-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.card-title { font-size: 22px; font-weight: 800; line-height: 1.25; }
+.card-body { font-size: 12px; line-height: 1.8; }
+.card-footer { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; opacity: 0.45; }
+
+.step-row { display: flex; flex-direction: column; gap: 9px; }
+.step { display: flex; align-items: flex-start; gap: 10px; font-size: 11.5px; font-weight: 600; line-height: 1.4; }
+.step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; transition: all 0.2s; }
+.dot.active { width: 18px; border-radius: 3px; background: #1a1a2e; }
+
+.c-dark { background: #1a1a2e; color: #fff; }
+.c-lime { background: #c8e435; color: #1a1a2e; }
+.c-light { background: #f5f5f0; color: #1a1a2e; border: 1px solid #e8e8e0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="slider" id="slider">
+
+    <div class="card c-dark">
+      <div class="deco" style="width:200px;height:200px;background:#c8e435;top:-80px;right:-80px;"></div>
+      <div class="deco" style="width:80px;height:80px;background:#fff;bottom:-20px;left:-20px;"></div>
+      <div>
+        <div class="card-tag" style="background:#c8e435;color:#1a1a2e;">TODAY</div>
+        <div class="card-title" style="font-size:26px;color:#fff;">오늘 런닝<br>전 꼭<br>읽어주세요</div>
+      </div>
+      <div class="card-footer" style="color:#fff;">NODEUL RUNNING CREW</div>
+    </div>
+
+    <div class="card c-lime">
+      <div class="deco" style="width:150px;height:150px;background:#1a1a2e;bottom:-50px;right:-50px;"></div>
+      <div>
+        <div class="card-tag" style="background:#1a1a2e;color:#c8e435;">PACER</div>
+        <div class="card-title" style="font-size:20px;margin-bottom:14px;">페이서는<br>랜덤 배정<br>됩니다</div>
+      </div>
+      <div>
+        <div class="card-body" style="color:#1a1a2e;opacity:0.75;">페이서의 수신호를 잘 따라와 주세요.<br>페이서가 외치는 경고 멘트도<br>함께 따라 외쳐주세요!</div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <span style="font-size:10px;font-weight:700;background:#1a1a2e;color:#c8e435;padding:3px 8px;border-radius:20px;">보행자 조심</span>
+          <span style="font-size:10px;font-weight:700;background:#1a1a2e;color:#c8e435;padding:3px 8px;border-radius:20px;">자전거 조심</span>
+          <span style="font-size:10px;font-weight:700;background:#1a1a2e;color:#c8e435;padding:3px 8px;border-radius:20px;">장애물 조심</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card c-dark">
+      <div class="deco" style="width:160px;height:160px;background:#c8e435;top:-60px;right:-60px;"></div>
+      <div>
+        <div class="card-tag" style="background:#c8e435;color:#1a1a2e;">RULE 01</div>
+        <div class="card-title" style="color:#fff;font-size:20px;margin-bottom:14px;">처음부터<br>끝까지<br>한 줄로!</div>
+      </div>
+      <div class="card-body" style="color:#fff;opacity:0.75;">
+        날씨가 좋아 한강에 사람이 많아요.<br>다른 분들의 통행을 위해<br>한 줄 대형을 유지해 주세요.
+      </div>
+    </div>
+
+    <div class="card c-light">
+      <div>
+        <div class="card-tag" style="background:#1a1a2e;color:#fff;">RULE 02</div>
+        <div class="card-title" style="font-size:20px;margin-bottom:14px;">5~10명씩<br>나눠서<br>달려요</div>
+      </div>
+      <div>
+        <div class="card-body" style="color:#1a1a2e;opacity:0.75;margin-bottom:10px;">
+          같은 페이스 내에서도 줄이 너무 길어지면 통행에 방해가 될 수 있어요. 소그룹으로 나눠서 달려주세요!
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:28px;height:4px;background:#c8e435;border-radius:2px;"></div>
+          <span style="font-size:10px;font-weight:700;color:#1a1a2e;opacity:0.5;">건강한 러닝 에티켓</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card c-lime">
+      <div class="deco" style="width:120px;height:120px;background:#1a1a2e;top:-40px;left:-40px;"></div>
+      <div>
+        <div class="card-tag" style="background:#1a1a2e;color:#c8e435;">NDRC</div>
+        <div class="card-title" style="font-size:19px;margin-bottom:12px;">건강한<br>러닝문화에<br>앞장섭니다</div>
+      </div>
+      <div>
+        <div class="card-body" style="color:#1a1a2e;opacity:0.7;margin-bottom:10px;">
+          함께 뛰는 모든 분들과<br>즐겁고 안전한 러닝 만들어가요.
+        </div>
+        <div class="card-footer" style="color:#1a1a2e;">NDRC · Since 2022.06.02</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dots" id="dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<script>
+var slider = document.getElementById("slider");
+var dots = document.querySelectorAll(".dot");
+slider.addEventListener("scroll", function() {
+  var idx = Math.round(slider.scrollLeft / 316);
+  dots.forEach(function(d, i) { d.classList.toggle("active", i === idx); });
+});
+</script>
+</body>
+</html>
